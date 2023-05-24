@@ -1,0 +1,210 @@
+<html>
+
+<head>
+	<title>{{ .title }}</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		:root {
+			--accent: #0081CF;
+			--bg: #0d1117;
+			--bg-subtle: #161b22;
+			--fg: #f0f0f0;
+			--fg-muted: #8b949e;
+			--border: #30363d;
+			--border-muted: #21263d;
+		}
+
+		html {
+			background-color: var(--bg);
+			color: var(--fg);
+		}
+
+		body {
+			font-family: sans-serif;
+			font-size: 16px;
+			line-height: 1.6;
+			margin: 0;
+		}
+
+		a {
+			display: block;
+			color: inherit;
+			text-decoration: none;
+			padding: 0.375rem 1rem;
+			border-radius: 0.25rem;
+			font-size: 0.875rem;
+			background-color: var(--accent);
+		}
+
+		.container {
+			border: none;
+			margin: 0 auto;
+			max-width: 864px;
+		}
+
+		.title-container {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+			position: relative;
+			padding: 0 0.5rem 0.5rem 0.875rem;
+		}
+
+		.title-container>h1 {
+			margin: 0;
+			padding: 0;
+			font-size: 2rem;
+			color: var(--fg);
+		}
+
+		.tracks {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.tracks>.track {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			gap: 0.5rem;
+			padding: 0.5rem;
+			border-top: 1px solid var(--border);
+		}
+
+		.tracks>.track>img {
+			border-radius: 1rem;
+			max-width: 80px;
+		}
+
+		.tracks>.track>.info {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-around;
+			gap: 0.25rem;
+		}
+
+		.tracks>.track>.info>.title {
+			font-size: 1rem;
+			font-weight: 600;
+		}
+
+		.tracks>.track>.info>.metadata {
+			display: flex;
+			flex-direction: row;
+			gap: 0.25rem;
+		}
+
+		.tracks>.track>.info>.metadata>span {
+			font-size: 0.625rem;
+			padding: 0.125rem 0.5rem;
+			border: 1px solid var(--border-muted);
+			border-radius: 0.25rem;
+		}
+
+		.controls {
+			width: 100%;
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			gap: 1rem;
+			margin-top: 2rem;
+		}
+
+		.controls>.seek {
+			flex-basis: 90%;
+		}
+
+		.apps {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+			justify-content: center;
+			gap: 2rem;
+			margin-top: 1rem;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div class="title-container">
+			<h1>
+				{{ .title }}
+			</h1>
+			{{ if .isModeMounted }}
+			<a href="/commands/unmount">Close</a>
+			{{ end }}
+			{{ if .isModePlaying }}
+			<a href="/commands/stop">Stop</a>
+			{{ end }}
+			{{ if .isModeApp }}
+			<a href="/commands/close-app">Close</a>
+			{{ end }}
+		</div>
+		{{ if .isModeIdle }}
+		<div class="apps">
+			{{ range $id, $dev := .devices }}
+			<a href="/commands/mount?id={{ $id }}">{{ $dev.Title }}</a>
+			{{ end }}
+		</div>
+		<div class="apps">
+			{{ range $id, $app := .apps }}
+			<a href="/commands/start-app?id={{ $id }}">{{ $app.Title }}</a>
+			{{ end }}
+		</div>
+		{{ end }}
+		{{ if .isModeMounted }}
+		<div class="tracks">
+			{{ range $track := .tracks }}
+			<div class="track">
+				<img src="data:image/png;base64, {{ $track.Preview }}" alt="Preview" />
+				<div class="info">
+					<div class="title">{{ $track.Title }}</div>
+					<div class="metadata">
+						<span>{{ $track.Metadata.Time }}</span>
+						<span>{{ $track.Metadata.Audio }}</span>
+						<!-- <span>Sub: {{ $track.Metadata.Subtitles }}</span> -->
+					</div>
+				</div>
+				<a href="/commands/play?id={{ $track.Id }}">Play</a>
+			</div>
+			{{ end }}
+		</div>
+		{{ end }}
+		{{ if .isModePlaying }}
+		<div class="controls">
+			<a href="#" onclick="sendCommand('toggle')">Play/Pause</a>
+			<a href="#" onclick="sendCommand('progress')">Progress</a>
+		</div>
+		<div class="controls">
+			<a href="#" onclick="sendCommand('audio')">Audio</a>
+			<a href="#" onclick="sendCommand('seek-start')">Start</a>
+			<a href="#" onclick="sendCommand('subtitles')">Subtitles</a>
+		</div>
+		<div class="controls">
+			<a href="#" onclick="sendCommand('big-back')">&lt;&lt;</a>
+			<a href="#" onclick="sendCommand('back')">&lt;</a>
+			<a href="#" onclick="sendCommand('skip')">&gt;</a>
+			<a href="#" onclick="sendCommand('big-skip')">&gt;&gt;</a>
+		</div>
+		<div class="controls">
+			<input type="range" min="0" max="100" value="0" class="seek" onchange="changeSeek(event)">
+		</div>
+		<script>
+			function sendCommand(command) {
+				fetch("/commands/" + command, {
+					method: "POST"
+				})
+			}
+
+			function changeSeek(event) {
+				sendCommand("seek?value=" + event.target.value)
+			}
+		</script>
+		{{ end }}
+	</div>
+</body>
+
+</html>
