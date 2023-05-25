@@ -16,6 +16,8 @@ type AppDescriptions map[string]AppDescription
 type DeviceDescriptions map[string]DeviceDescription
 
 const MOUNT_DIR string = "/mnt/outback"
+const USE_BG bool = false
+const USE_MUSIC bool = false
 
 var DEVICES DeviceDescriptions = DeviceDescriptions{
 	"optical": DeviceDescription{

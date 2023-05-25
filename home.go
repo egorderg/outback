@@ -1,7 +1,7 @@
 package main
 
 import (
-	"egorderg/outback/com"
+	"github.com/egorderg/outback/com"
 
 	"github.com/gin-gonic/gin"
 )

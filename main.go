@@ -1,12 +1,13 @@
 package main
 
 import (
-	"egorderg/outback/com"
 	"html/template"
 	"io/ioutil"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/egorderg/outback/com"
 
 	"github.com/gin-gonic/gin"
 )

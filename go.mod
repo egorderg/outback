@@ -1,4 +1,4 @@
-module egorderg/outback
+module github.com/egorderg/outback
 
 go 1.20
 

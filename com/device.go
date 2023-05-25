@@ -78,18 +78,22 @@ func (d *Device) Mount(id string) error {
 		return err
 	}
 
-	bg := path.Join(d.config.mountDir, BG_FILE)
-	if _, err := os.Stat(bg); os.IsNotExist(err) {
-		resetBackground()
-	} else {
-		setBackground(bg)
+	if USE_BG {
+		bg := path.Join(d.config.mountDir, BG_FILE)
+		if _, err := os.Stat(bg); os.IsNotExist(err) {
+			resetBackground()
+		} else {
+			setBackground(bg)
+		}
 	}
 
-	music := path.Join(d.config.mountDir, MUSIC_FILE)
-	if _, err := os.Stat(bg); os.IsNotExist(err) {
-		stopMusic()
-	} else {
-		playMusic(music)
+	if USE_MUSIC {
+		music := path.Join(d.config.mountDir, MUSIC_FILE)
+		if _, err := os.Stat(music); os.IsNotExist(err) {
+			stopMusic()
+		} else {
+			playMusic(music)
+		}
 	}
 
 	d.tracks = tracks
